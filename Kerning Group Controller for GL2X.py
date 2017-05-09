@@ -3,7 +3,7 @@
 """
 KerningGroupsController-forGL2.3.py
 Created by Alexandr Hudeček on 2017-05-17.
-Copyright (c) 2017 odoka.cz. All rights reserved.
+Copyright (c) 2017 odoka.cz. All rights reserved..
 """
 
 import vanilla
