@@ -35,6 +35,10 @@ for thisGlyph in thisFont.glyphs:
 			groupsR[thisGlyph.rightKerningGroup] = []
 		groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
 
+print groupsL
+for groupName in groupsL:
+    print groupName
+
 class RenameKerningGroups( object ):
 	def __init__( self ):
 		# Window 'self.w':
