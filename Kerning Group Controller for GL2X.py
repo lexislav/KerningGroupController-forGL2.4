@@ -110,7 +110,7 @@ class AppController:
         w.buttonProcess = vanilla.Button((-15 - 80, -15 - 20, -15, -15), "Go", sizeStyle = 'regular', callback=self.process)
         w.setDefaultButton(w.buttonProcess)
 
-        #w.spinner = vanilla.ProgressSpinner((15, -15 - 16, 16, 16), sizeStyle = 'regular')
+        w.spinner = vanilla.ProgressSpinner((15, -15 - 16, 16, 16), sizeStyle = 'regular')
 
         return w
 
@@ -136,13 +136,22 @@ class AppController:
         return out
 
     def switchList(self, sender):
-		try:
-			if self.w.radio.get() == 0:
-				self.w.popupGroup.setItems(sorted(groupsL))
-			elif self.w.radio.get() == 1:
-				self.w.popupGroup.setItems(sorted(groupsR))
-		except Exception, e:
-			print "Kerning Group Controller Error (switchList): %s" % e
+        index = 0
+        try:
+            if self.w.radio.get() == 0:
+                self.w.popupGroup.setItems(sorted(groupsL))
+                self.w.popupAssign.setItems(sorted(groupsL))
+                self.selectedGroupName = sorted(groupsL)[index]
+                self.refreshSelectedGroupGlyphs(groupsL)
+                self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+            elif self.w.radio.get() == 1:
+                self.w.popupGroup.setItems(sorted(groupsR))
+                self.w.popupAssign.setItems(sorted(groupsR))
+                self.selectedGroupName =  sorted(groupsR)[index]
+                self.refreshSelectedGroupGlyphs(groupsR)
+                self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+        except Exception, e:
+            print "Kerning Group Controller Error (switchList): %s" % e
 
     def adjustGlyphsList(self, sender):
         index = self.w.popupGroup.get()
