@@ -37,7 +37,6 @@ for thisGlyph in thisFont.glyphs:
 			groupsR[thisGlyph.rightKerningGroup] = []
 		groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
 
-
 class AppController:
 
     #WINDOW SETTINGS
@@ -50,8 +49,19 @@ class AppController:
     windowHeight = 405
     popupAdjust = 3
 
+    #properties
+    selectedGroupGlyphs = []
+    selectedGroupName = sorted(groupsL)[0]
+
+    def refreshSelectedGroupGlyphs(self, group):
+        self.selectedGroupGlyphs = []
+        for glyphName in group[self.selectedGroupName]:
+            self.selectedGroupGlyphs.append(glyphName)
+            # print glyphName,' '
+
     #init opens the window
     def __init__(self):
+        self.refreshSelectedGroupGlyphs(groupsL)
         self.w = self.getWindow()
         self.w.open()
         pass
@@ -75,10 +85,10 @@ class AppController:
         w.radio.set(0)
         height += self.spaceY+self.textY
         w.text1 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Choose Group", sizeStyle='regular' )
-        w.popupGroup = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(groupsL)], sizeStyle='regular' )
+        w.popupGroup = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(groupsL)], sizeStyle='regular', callback=self.adjustGlyphsList)
         height += self.spaceY+self.textY
         w.text2 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Choose glyph", sizeStyle='regular' )
-        w.popupGlyph = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(groupsL)], sizeStyle='regular' )
+        w.popupGlyph = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(self.selectedGroupGlyphs)], sizeStyle='regular' )
         height += self.spaceY+self.textY
         w.text3 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "What to do", sizeStyle='regular' )
         w.radioOptions = vanilla.RadioGroup( (self.spaceX+130, height, 150, self.textY*5), ["copy kerning values","relative change in %","absolute change","do not kern"], isVertical = True, sizeStyle='regular')
@@ -94,38 +104,13 @@ class AppController:
         w.radioApplyTo = vanilla.RadioGroup((self.spaceX+130, height, -15, 40), [ "To current font only", "To all open fonts" ], sizeStyle = 'regular' )
         w.radioApplyTo.set(0)
 
-        #height += 40 + 20
-
-        # w.textApply = vanilla.TextBox((15, height, 80, 20), "Apply:", sizeStyle = 'regular')
         # w.checkBoxRenameIndividualGlyphs = vanilla.CheckBox((80, height, -15, 19), "Rename individual glyphs", value=False, sizeStyle = 'regular')
-        # height += 19
-        # w.checkBoxUpdateGlyphInfo = vanilla.CheckBox((80, height, -15, 19), "Apply Update Glyph Info", value=True, sizeStyle = 'regular')
-        # height += 19
-        # w.checkBoxAddSuffixesToLigatures = vanilla.CheckBox((80, height, -15, 19), "Add suffixes to ligatures", value=False, sizeStyle = 'regular')
-        # height += 19
-        # w.checkBoxRenameSuffixes = vanilla.CheckBox((80, height, -15, 19), "Rename suffixes", value=False, sizeStyle = 'regular')
-        # height += 19
-        #
-        # height += 20
-        #
         # w.textOptions = vanilla.TextBox((15, height, 80, 20), "Remove:", sizeStyle = 'regular')
-        # w.checkBoxDeleteUnnecessaryGlyphs = vanilla.CheckBox((80, height, -15, 19), "Delete Unnecessary Glyphs", value = False, sizeStyle = 'regular')
-        # height += 19
-        # w.checkBoxRemoveGlyphOrder = vanilla.CheckBox((80, height, -15, 19), "original glyph order ", value=False, sizeStyle = 'regular')
-        # height += 19
-        # w.checkBoxRemoveAllCustomParameters = vanilla.CheckBox((80, height, -15, 19), "all custom parameters", value=False, sizeStyle = 'regular')
-        # height += 19
-        # w.checkBoxRemoveAllMastersCustomParameters = vanilla.CheckBox((80, height, -15, 19), "all masters custom parameters", value=False, sizeStyle = 'regular')
-        # height += 19
-        # w.checkBoxRemoveAllFeatures = vanilla.CheckBox((80, height, -15, 19), "all OpenType features, classes, prefixes", value=False, sizeStyle = 'regular')
-        # height += 19
-        # w.checkBoxRemovePUA = vanilla.CheckBox((80, height, -15, 19), "remove PUA", value=False, sizeStyle = 'regular')
-        # height += 19
 
-        w.buttonProcess = vanilla.Button((-15 - 80, -15 - 20, -15, -15), "Process", sizeStyle = 'regular', callback=self.process)
+        w.buttonProcess = vanilla.Button((-15 - 80, -15 - 20, -15, -15), "Go", sizeStyle = 'regular', callback=self.process)
         w.setDefaultButton(w.buttonProcess)
 
-        w.spinner = vanilla.ProgressSpinner((15, -15 - 16, 16, 16), sizeStyle = 'regular')
+        #w.spinner = vanilla.ProgressSpinner((15, -15 - 16, 16, 16), sizeStyle = 'regular')
 
         return w
 
@@ -157,7 +142,24 @@ class AppController:
 			elif self.w.radio.get() == 1:
 				self.w.popupGroup.setItems(sorted(groupsR))
 		except Exception, e:
-			print "Rename Kerning Group Error (switchList): %s" % e
+			print "Kerning Group Controller Error (switchList): %s" % e
+
+    def adjustGlyphsList(self, sender):
+        index = self.w.popupGroup.get()
+        try:
+            if self.w.radio.get() == 0:
+                self.selectedGroupName = sorted(groupsL)[index]
+                #print self.selectedGroupName
+                self.refreshSelectedGroupGlyphs(groupsL)
+                self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+            elif self.w.radio.get() == 1:
+                self.selectedGroupName =  sorted(groupsR)[index]
+                #print self.selectedGroupName
+                self.refreshSelectedGroupGlyphs(groupsR)
+                self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+        except Exception, e:
+            print "Kerning Group Controller Error (switchList): %s" % e
+
 
     def process(self, sender):
         self.w.spinner.start()
