@@ -73,7 +73,7 @@ class AppController:
 			( self.windowWidth, self.windowHeight ), # default window size
 			"Kerning Groups Controller", # window title
 			minSize = ( self.windowWidth, self.windowHeight ), # minimum size (for resizing)
-			maxSize = ( self.windowWidth + 240, self.windowHeight + 300), # maximum size (for resizing)
+			maxSize = ( self.windowWidth + 440, self.windowHeight + 300), # maximum size (for resizing)
 			autosaveName = "com.OdOka.KerningGroupsController.mainwindow" # stores last window position and size
 		)
 
@@ -91,7 +91,7 @@ class AppController:
         w.workWithGlyphs = vanilla.EditText( (self.spaceX + 130, height, -15, self.editY), "", sizeStyle = 'regular' )
         #w.popupGlyph = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(self.selectedGroupGlyphs)], sizeStyle='regular' )
         height += self.spaceY+self.textY
-        w.textGM = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Glyphs in selected group", sizeStyle='regular' )
+        w.textGM = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Glyphs in selected group", sizeStyle='small' )
         w.textG = vanilla.TextBox( (self.spaceX+130, height, -15, -15), ','.join(sorted(self.selectedGroupGlyphs)), sizeStyle='small' )
         height += self.spaceY+self.textY*2 + self.spaceY
         w.text3 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "What to do", sizeStyle='regular' )
@@ -102,8 +102,12 @@ class AppController:
         w.value = vanilla.EditText( (self.spaceX+165+self.spaceX, height, 40, self.editY), "", sizeStyle = 'regular' )
         height += self.spaceY+self.editY
         w.text5 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Assign new group", sizeStyle='regular' )
-        w.popupAssign = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(groupsL)], sizeStyle='regular' )
-        height += self.spaceY+self.editY
+        w.assignNewGroup = vanilla.EditText( (self.spaceX + 130, height, -15, self.editY), "", sizeStyle = 'regular' )
+        #w.popupAssign = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(groupsL)], sizeStyle='regular' )
+        height += self.spaceY+self.textY
+        #w.textEG = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Existing groups", sizeStyle='small' )
+        #w.textEGL = vanilla.TextBox( (self.spaceX+130, height, -15, -15), ','.join(sorted(groupsL)), sizeStyle='small' )
+        #height += self.spaceY+self.textY*2 + self.spaceY
         w.text6 = vanilla.TextBox((self.spaceX, height, 80, 20), "Apply to:", sizeStyle = 'regular')
         w.radioApplyTo = vanilla.RadioGroup((self.spaceX+130, height, -15, 40), [ "To current font only", "To all open fonts" ], sizeStyle = 'regular' )
         w.radioApplyTo.set(0)
