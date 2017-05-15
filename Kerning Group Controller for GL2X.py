@@ -73,7 +73,7 @@ class AppController:
 			( self.windowWidth, self.windowHeight ), # default window size
 			"Kerning Groups Controller", # window title
 			minSize = ( self.windowWidth, self.windowHeight ), # minimum size (for resizing)
-			maxSize = ( self.windowWidth + 440, self.windowHeight + 300), # maximum size (for resizing)
+			maxSize = ( self.windowWidth + 540, self.windowHeight + 140), # maximum size (for resizing)
 			autosaveName = "com.OdOka.KerningGroupsController.mainwindow" # stores last window position and size
 		)
 
