@@ -88,8 +88,12 @@ class AppController:
         w.popupGroup = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(groupsL)], sizeStyle='regular', callback=self.adjustGlyphsList)
         height += self.spaceY+self.textY
         w.text2 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Choose glyph", sizeStyle='regular' )
-        w.popupGlyph = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(self.selectedGroupGlyphs)], sizeStyle='regular' )
+        w.workWithGlyphs = vanilla.EditText( (self.spaceX + 130, height, -15, self.editY), "", sizeStyle = 'regular' )
+        #w.popupGlyph = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(self.selectedGroupGlyphs)], sizeStyle='regular' )
         height += self.spaceY+self.textY
+        w.textGM = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Glyphs in selected group", sizeStyle='regular' )
+        w.textG = vanilla.TextBox( (self.spaceX+130, height, -15, -15), ','.join(sorted(self.selectedGroupGlyphs)), sizeStyle='small' )
+        height += self.spaceY+self.textY*2 + self.spaceY
         w.text3 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "What to do", sizeStyle='regular' )
         w.radioOptions = vanilla.RadioGroup( (self.spaceX+130, height, 150, self.textY*5), ["copy kerning values","relative change in %","absolute change","do not kern"], isVertical = True, sizeStyle='regular')
         w.radioOptions.set(0)
@@ -160,12 +164,15 @@ class AppController:
                 self.selectedGroupName = sorted(groupsL)[index]
                 #print self.selectedGroupName
                 self.refreshSelectedGroupGlyphs(groupsL)
-                self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+                #self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+                self.w.textG.set(','.join(sorted(self.selectedGroupGlyphs)))
+                #self.w.textG.resize(-15,100)
             elif self.w.radio.get() == 1:
                 self.selectedGroupName =  sorted(groupsR)[index]
                 #print self.selectedGroupName
                 self.refreshSelectedGroupGlyphs(groupsR)
-                self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+                #self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+                self.w.textG.set(','.join(sorted(self.selectedGroupGlyphs)))
         except Exception, e:
             print "Kerning Group Controller Error (switchList): %s" % e
 
