@@ -36,6 +36,8 @@ for thisGlyph in thisFont.glyphs:
 		if not thisGlyph.rightKerningGroup in groupsR:
 			groupsR[thisGlyph.rightKerningGroup] = []
 		groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
+else:
+    print "No groups"
 
 class AppController:
 
@@ -51,17 +53,22 @@ class AppController:
 
     #properties
     selectedGroupGlyphs = []
-    selectedGroupName = sorted(groupsL)[0]
+    selectedGroupName = ""
+    if groupsL:
+        selectedGroupName = sorted(groupsL)[0]
 
     def refreshSelectedGroupGlyphs(self, group):
         self.selectedGroupGlyphs = []
         for glyphName in group[self.selectedGroupName]:
             self.selectedGroupGlyphs.append(glyphName)
+        else:
+            print "Empty groups"
             # print glyphName,' '
 
     #init opens the window
     def __init__(self):
-        self.refreshSelectedGroupGlyphs(groupsL)
+        if groupL:
+            self.refreshSelectedGroupGlyphs(groupsL)
         self.w = self.getWindow()
         self.w.open()
         pass
