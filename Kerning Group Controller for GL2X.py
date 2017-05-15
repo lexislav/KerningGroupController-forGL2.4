@@ -85,13 +85,13 @@ class AppController:
         w.radio.set(0)
         height += self.spaceY+self.textY
         w.text1 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Choose Group", sizeStyle='regular' )
-        w.popupGroup = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(groupsL)], sizeStyle='regular', callback=self.adjustGlyphsList)
+        w.popupGroup = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -15, self.editY), [str(x) for x in sorted(groupsL)], sizeStyle='regular', callback=self.adjustGlyphsList)
         height += self.spaceY+self.textY
         w.text2 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Choose glyph", sizeStyle='regular' )
         w.workWithGlyphs = vanilla.EditText( (self.spaceX + 130, height, -15, self.editY), "", sizeStyle = 'regular' )
         #w.popupGlyph = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(self.selectedGroupGlyphs)], sizeStyle='regular' )
         height += self.spaceY+self.textY
-        w.textGM = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Glyphs in selected group", sizeStyle='small' )
+        w.textGM = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Glyphs in group", sizeStyle='small' )
         w.textG = vanilla.TextBox( (self.spaceX+130, height, -15, -15), ','.join(sorted(self.selectedGroupGlyphs)), sizeStyle='small' )
         height += self.spaceY+self.textY*2 + self.spaceY
         w.text3 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "What to do", sizeStyle='regular' )
