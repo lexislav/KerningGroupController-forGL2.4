@@ -31,13 +31,11 @@ for thisGlyph in thisFont.glyphs:
 		if not thisGlyph.leftKerningGroup in groupsL:
 			groupsL[thisGlyph.leftKerningGroup] = []
 		groupsL[thisGlyph.leftKerningGroup].append(thisGlyph.name)
-
 	if thisGlyph.rightKerningGroup != None:
 		if not thisGlyph.rightKerningGroup in groupsR:
 			groupsR[thisGlyph.rightKerningGroup] = []
 		groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
-else:
-    print "No groups"
+
 
 class AppController:
 
@@ -61,13 +59,11 @@ class AppController:
         self.selectedGroupGlyphs = []
         for glyphName in group[self.selectedGroupName]:
             self.selectedGroupGlyphs.append(glyphName)
-        else:
-            print "Empty groups"
             # print glyphName,' '
 
     #init opens the window
     def __init__(self):
-        if groupL:
+        if groupsL:
             self.refreshSelectedGroupGlyphs(groupsL)
         self.w = self.getWindow()
         self.w.open()
@@ -99,7 +95,10 @@ class AppController:
         #w.popupGlyph = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(self.selectedGroupGlyphs)], sizeStyle='regular' )
         height += self.spaceY+self.textY
         w.textGM = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Glyphs in group", sizeStyle='small' )
-        w.textG = vanilla.TextBox( (self.spaceX+130, height, -15, -15), ','.join(sorted(self.selectedGroupGlyphs)), sizeStyle='small' )
+        glyphsInGroupHelper = "No groups. No glyphs."
+        if self.selectedGroupName <> "":
+            glyphsInGroupHelper = ','.join(sorted(self.selectedGroupGlyphs))
+        w.textG = vanilla.TextBox( (self.spaceX+130, height, -15, -15), , sizeStyle='small' )
         height += self.spaceY+self.textY*2 + self.spaceY
         w.text3 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "What to do", sizeStyle='regular' )
         w.radioOptions = vanilla.RadioGroup( (self.spaceX+130, height, 150, self.textY*5), ["copy kerning values","relative change in %","absolute change","do not kern"], isVertical = True, sizeStyle='regular')
@@ -154,17 +153,25 @@ class AppController:
         index = 0
         try:
             if self.w.radio.get() == 0:
-                self.w.popupGroup.setItems(sorted(groupsL))
-                self.w.popupAssign.setItems(sorted(groupsL))
-                self.selectedGroupName = sorted(groupsL)[index]
-                self.refreshSelectedGroupGlyphs(groupsL)
-                self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+                if groupsL:
+                    self.w.popupGroup.setItems(sorted(groupsL))
+                    self.selectedGroupName = sorted(groupsL)[index]
+                    self.refreshSelectedGroupGlyphs(groupsL)
+                    self.w.textG.set(','.join(sorted(self.selectedGroupGlyphs)))
+                else:
+                    self.w.popupGroup.setItems([])
+                    self.selectedGroupName = ""
+                    self.w.textG.set("No group, No glyphs.")
             elif self.w.radio.get() == 1:
-                self.w.popupGroup.setItems(sorted(groupsR))
-                self.w.popupAssign.setItems(sorted(groupsR))
-                self.selectedGroupName =  sorted(groupsR)[index]
-                self.refreshSelectedGroupGlyphs(groupsR)
-                self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
+                if groupsR:
+                    self.w.popupGroup.setItems(sorted(groupsR))
+                    self.selectedGroupName =  sorted(groupsR)[index]
+                    self.refreshSelectedGroupGlyphs(groupsR)
+                    self.w.textG.set(','.join(sorted(self.selectedGroupGlyphs)))
+                else:
+                    self.w.popupGroup.setItems([])
+                    self.selectedGroupName = ""
+                    self.w.textG.set("No group, No glyphs.")
         except Exception, e:
             print "Kerning Group Controller Error (switchList): %s" % e
 
@@ -173,16 +180,11 @@ class AppController:
         try:
             if self.w.radio.get() == 0:
                 self.selectedGroupName = sorted(groupsL)[index]
-                #print self.selectedGroupName
                 self.refreshSelectedGroupGlyphs(groupsL)
-                #self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
                 self.w.textG.set(','.join(sorted(self.selectedGroupGlyphs)))
-                #self.w.textG.resize(-15,100)
             elif self.w.radio.get() == 1:
                 self.selectedGroupName =  sorted(groupsR)[index]
-                #print self.selectedGroupName
                 self.refreshSelectedGroupGlyphs(groupsR)
-                #self.w.popupGlyph.setItems(sorted(self.selectedGroupGlyphs))
                 self.w.textG.set(','.join(sorted(self.selectedGroupGlyphs)))
         except Exception, e:
             print "Kerning Group Controller Error (switchList): %s" % e
