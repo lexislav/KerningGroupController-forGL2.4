@@ -139,18 +139,13 @@ class AppController:
 
     def getSettings(self):
         out = {
-            #"input": self.w.radioInput.get(),
-            "options": {
-                # "UpdateGlyphInfo": self.w.checkBoxUpdateGlyphInfo.get(),
-                # "RemoveGlyphOrder": self.w.checkBoxRemoveGlyphOrder.get(),
-                # "RemoveAllCustomParameters": self.w.checkBoxRemoveAllCustomParameters.get(),
-                # "RemoveAllMastersCustomParameters": self.w.checkBoxRemoveAllMastersCustomParameters.get(),
-                # "AddSuffixesToLigatures": self.w.checkBoxAddSuffixesToLigatures.get(),
-                # "RenameSuffixes": self.w.checkBoxRenameSuffixes.get(),
-                # "RenameIndividualGlyphs": self.w.checkBoxRenameIndividualGlyphs.get(),
-                # "RemoveAllFeatures": self.w.checkBoxRemoveAllFeatures.get(),
-                # "RemovePUA": self.w.checkBoxRemovePUA.get(),
-                # "DeleteUnnecessaryGlyphs": self.w.checkBoxDeleteUnnecessaryGlyphs.get()
+            "configuration": {
+                "side": self.w.radio.get(),
+                "selectedGroup": self.w.popupGroup.get(),
+                "proceedGlyphs": self.w.workWithGlyphs.get(),
+                "whatToDo": self.w.radioOptions.get(),
+                "valueToSet": self.w.value.get(),
+                "newGroup": self.w.assignNewGroup.get()
             }
         }
         return out
@@ -243,12 +238,10 @@ class AppWorker:
 
 
     def start(self, settings):
-
         self.outputLog = ''
         self.printLog('==== Starting ====',False)
+        print(settings)
         self.printLog('===== Done. =====',False)
-
-
 
     def log(self, s):
 
