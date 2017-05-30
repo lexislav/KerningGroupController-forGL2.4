@@ -140,7 +140,7 @@ class AppController:
     def getSettings(self):
         out = {
             "configuration": {
-                "side": self.w.radio.get(),
+                "side": 'left' if self.w.radio.get() == 0 else 'right',
                 "selectedGroup": self.selectedGroupName,
                 "proceedGlyphs": self.w.workWithGlyphs.get().replace(" ","").split(","),
                 "whatToDo": self.w.radioOptions.get(),
@@ -240,7 +240,7 @@ class AppWorker:
     def start(self, settings):
         self.outputLog = ''
         self.printLog('==== Starting ====',False)
-        
+        print(settings)
         self.printLog('===== Done. =====',False)
 
     def log(self, s):
