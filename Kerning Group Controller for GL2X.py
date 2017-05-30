@@ -141,8 +141,8 @@ class AppController:
         out = {
             "configuration": {
                 "side": self.w.radio.get(),
-                "selectedGroup": self.w.popupGroup.get(),
-                "proceedGlyphs": self.w.workWithGlyphs.get(),
+                "selectedGroup": self.selectedGroupName,
+                "proceedGlyphs": self.w.workWithGlyphs.get().replace(" ","").split(","),
                 "whatToDo": self.w.radioOptions.get(),
                 "valueToSet": self.w.value.get(),
                 "newGroup": self.w.assignNewGroup.get()
@@ -240,7 +240,7 @@ class AppWorker:
     def start(self, settings):
         self.outputLog = ''
         self.printLog('==== Starting ====',False)
-        print(settings)
+        
         self.printLog('===== Done. =====',False)
 
     def log(self, s):
