@@ -10,32 +10,36 @@ import vanilla
 import os
 
 thisFont = Glyphs.font
-# builing a more accessible kerning dictionary
-# it's a dictionary of lists. newKernDic[master.id][left, right, value]
-kernDic = thisFont.kerningDict()
-newKernDic = {}
-for thisMaster in thisFont.masters:
-	kernList = []
-	for key1 in kernDic[thisMaster.id]:
-		for key2 in kernDic[thisMaster.id][key1]:
-			pairInList = [key1, key2, kernDic[thisMaster.id][key1][key2]]
-			kernList.append(pairInList)
-		newKernDic[thisMaster.id] = kernList
+run = True
+if thisFont == None:
+    print "Error: No font"
+    run = False
+else:
+    # builing a more accessible kerning dictionary
+    # it's a dictionary of lists. newKernDic[master.id][left, right, value]
+    kernDic = thisFont.kerningDict()
+    newKernDic = {}
+    for thisMaster in thisFont.masters:
+    	kernList = []
+    	for key1 in kernDic[thisMaster.id]:
+    		for key2 in kernDic[thisMaster.id][key1]:
+    			pairInList = [key1, key2, kernDic[thisMaster.id][key1][key2]]
+    			kernList.append(pairInList)
+    		newKernDic[thisMaster.id] = kernList
 
-# building popup list
-# each value contains a list of glyphs involved. groupsL/R[groupName][glyph, glyph, glyph...]
-groupsL = {}
-groupsR = {}
-for thisGlyph in thisFont.glyphs:
-	if thisGlyph.leftKerningGroup != None:
-		if not thisGlyph.leftKerningGroup in groupsL:
-			groupsL[thisGlyph.leftKerningGroup] = []
-		groupsL[thisGlyph.leftKerningGroup].append(thisGlyph.name)
-	if thisGlyph.rightKerningGroup != None:
-		if not thisGlyph.rightKerningGroup in groupsR:
-			groupsR[thisGlyph.rightKerningGroup] = []
-		groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
-
+    # building popup list
+    # each value contains a list of glyphs involved. groupsL/R[groupName][glyph, glyph, glyph...]
+    groupsL = {}
+    groupsR = {}
+    for thisGlyph in thisFont.glyphs:
+    	if thisGlyph.leftKerningGroup != None:
+    		if not thisGlyph.leftKerningGroup in groupsL:
+    			groupsL[thisGlyph.leftKerningGroup] = []
+    		groupsL[thisGlyph.leftKerningGroup].append(thisGlyph.name)
+    	if thisGlyph.rightKerningGroup != None:
+    		if not thisGlyph.rightKerningGroup in groupsR:
+    			groupsR[thisGlyph.rightKerningGroup] = []
+    		groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
 
 class AppController:
 
@@ -46,14 +50,12 @@ class AppController:
     spaceX = 10
     spaceY = 20
     windowWidth  = spaceX*3+editX*1.5
-    windowHeight = 405
+    windowHeight = 365
     popupAdjust = 3
 
     #properties
     selectedGroupGlyphs = []
     selectedGroupName = ""
-    if groupsL:
-        selectedGroupName = sorted(groupsL)[0]
 
     def refreshSelectedGroupGlyphs(self, group):
         self.selectedGroupGlyphs = []
@@ -63,7 +65,10 @@ class AppController:
 
     #init opens the window
     def __init__(self):
+        if not run:
+            return
         if groupsL:
+            self.selectedGroupName = sorted(groupsL)[0]
             self.refreshSelectedGroupGlyphs(groupsL)
         self.w = self.getWindow()
         self.w.open()
@@ -114,9 +119,10 @@ class AppController:
         #w.textEG = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Existing groups", sizeStyle='small' )
         #w.textEGL = vanilla.TextBox( (self.spaceX+130, height, -15, -15), ','.join(sorted(groupsL)), sizeStyle='small' )
         #height += self.spaceY+self.textY*2 + self.spaceY
-        w.text6 = vanilla.TextBox((self.spaceX, height, 80, 20), "Apply to:", sizeStyle = 'regular')
-        w.radioApplyTo = vanilla.RadioGroup((self.spaceX+130, height, -15, 40), [ "To current font only", "To all open fonts" ], sizeStyle = 'regular' )
-        w.radioApplyTo.set(0)
+        #all font deactivated
+        #w.text6 = vanilla.TextBox((self.spaceX, height, 80, 20), "Apply to:", sizeStyle = 'regular')
+        #w.radioApplyTo = vanilla.RadioGroup((self.spaceX+130, height, -15, 40), [ "To current font only", "To all open fonts" ], sizeStyle = 'regular' )
+        #w.radioApplyTo.set(0)
 
         # w.checkBoxRenameIndividualGlyphs = vanilla.CheckBox((80, height, -15, 19), "Rename individual glyphs", value=False, sizeStyle = 'regular')
         # w.textOptions = vanilla.TextBox((15, height, 80, 20), "Remove:", sizeStyle = 'regular')
