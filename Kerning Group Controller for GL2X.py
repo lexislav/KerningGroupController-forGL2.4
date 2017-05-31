@@ -234,7 +234,7 @@ class AppWorker:
 
         Glyphs.redraw()
         return True
-
+ow
 
 
     def start(self, settings):
