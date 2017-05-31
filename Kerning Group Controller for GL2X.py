@@ -9,12 +9,13 @@ Copyright (c) 2017 odoka.cz. All rights reserved.
 import vanilla
 import os
 
-thisFont = Glyphs.font
-run = True
-if thisFont == None:
-    print "Error: No font"
-    run = False
-else:
+try:
+    thisFont = Glyphs.font
+    selectedMaster = thisFont.selectedFontMaster
+    masterID = selectedMaster.id
+    run = True
+    if thisFont == None:
+        run = False
     # builing a more accessible kerning dictionary
     # it's a dictionary of lists. newKernDic[master.id][left, right, value]
     kernDic = thisFont.kerningDict()
@@ -31,15 +32,20 @@ else:
     # each value contains a list of glyphs involved. groupsL/R[groupName][glyph, glyph, glyph...]
     groupsL = {}
     groupsR = {}
+
     for thisGlyph in thisFont.glyphs:
-    	if thisGlyph.leftKerningGroup != None:
+        if thisGlyph.leftKerningGroup != None:
     		if not thisGlyph.leftKerningGroup in groupsL:
     			groupsL[thisGlyph.leftKerningGroup] = []
     		groupsL[thisGlyph.leftKerningGroup].append(thisGlyph.name)
-    	if thisGlyph.rightKerningGroup != None:
-    		if not thisGlyph.rightKerningGroup in groupsR:
+        if thisGlyph.rightKerningGroup != None:
+            if not thisGlyph.rightKerningGroup in groupsR:
     			groupsR[thisGlyph.rightKerningGroup] = []
-    		groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
+            groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
+
+except:
+    print "No font or another startup error."
+    pass
 
 class AppController:
 
@@ -78,12 +84,12 @@ class AppController:
 
         #open window
         w = vanilla.FloatingWindow(
-			( self.windowWidth, self.windowHeight ), # default window size
-			"Kerning Groups Controller", # window title
-			minSize = ( self.windowWidth, self.windowHeight ), # minimum size (for resizing)
-			maxSize = ( self.windowWidth + 540, self.windowHeight + 140), # maximum size (for resizing)
-			autosaveName = "com.OdOka.KerningGroupsController.mainwindow" # stores last window position and size
-		)
+    ( self.windowWidth, self.windowHeight ), # default window size
+    "Kerning Groups Controller", # window title
+    minSize = ( self.windowWidth, self.windowHeight ), # minimum size (for resizing)
+    maxSize = ( self.windowWidth + 540, self.windowHeight + 140), # maximum size (for resizing)
+    autosaveName = "com.OdOka.KerningGroupsController.mainwindow" # stores last window position and size
+    )
 
         #UI
         height = self.spaceY
@@ -139,14 +145,12 @@ class AppController:
 
     def getSettings(self):
         out = {
-            "configuration": {
                 "side": 'left' if self.w.radio.get() == 0 else 'right',
                 "selectedGroup": self.selectedGroupName,
                 "proceedGlyphs": self.w.workWithGlyphs.get().replace(" ","").split(","),
                 "whatToDo": self.w.radioOptions.get(),
                 "valueToSet": self.w.value.get(),
                 "newGroup": self.w.assignNewGroup.get()
-            }
         }
         return out
 
@@ -231,25 +235,83 @@ class AppWorker:
         self.printLog(message, False)
         message = '-' * messlength
         self.printLog(message, True)
-
         Glyphs.redraw()
         return True
 
+    def nameMaker(self, kernGlyph):
+        if kernGlyph[0] == "@":
+            return kernGlyph[7:]
+        else:
+            return thisFont.glyphForId_(kernGlyph).name
+
+    def wtd_to_strings(self, argument):
+        switcher = {
+            0: "copied",
+            1: "added in %",
+            2: "set",
+        }
+        return switcher.get(argument, "nothing")
 
     def start(self, settings):
         self.outputLog = ''
         self.printLog('==== Starting ====',False)
-        print(settings)
+        #vyjmout glyph ze skupiny
+        for G in settings["proceedGlyphs"]:
+            Gnamed = "@MMK_R_" + G
+            if settings["newGroup"] == "":
+                GnewGroup = G
+            else:
+                GnewGroup = settings["newGroup"]
+            self.printLog('Proceeding Glyph %s' % G,False)
+            self.printLog('will be removed from group %s' % settings["selectedGroup"],False)
+            self.printLog('assigned to new group %s' % GnewGroup,False)
+            #all kernign pairs for glyph (both sides for now)
+            leftPairs = []
+            rightPairs = []
+            for L in thisFont.kerning[masterID]:
+                if L == "@MMK_L_" + G:
+                    for R in thisFont.kerning[masterID][L]:
+                        leftPairs.append(self.nameMaker(R))
+                else:
+                    if Gnamed in thisFont.kerning[masterID][L]:
+                        rightPairs.append(self.nameMaker(L))
+            glyphOnLeftSide = ", ".join(sorted(leftPairs))
+            glyphOnRightSide = ", ".join(sorted(rightPairs))
+
+            valueToSet = 0
+            try:
+                valueToSet = int(settings["valueToSet"])
+            except ValueError:
+                self.printLog('Value error',False)
+                pass
+
+
+            if settings["whatToDo"] == 0:
+                self.printLog('kerning will be copied from existing pairs', False)
+            if settings["whatToDo"] == 1:
+                self.printLog('kerning will be adjusted for %s  (percent)' % valueToSet, False)
+            if settings["whatToDo"] == 2:
+                self.printLog('kerning will set to %s' % valueToSet, False)
+            if settings["whatToDo"] == 2:
+                self.printLog('kerning won''t be set', False)
+
+            self.printLog('In pairs on left side %s' % glyphOnLeftSide,False)
+            self.printLog('In pairs on right side %s' % glyphOnRightSide,False)
+
+        # doThatwithG
+        #pokud je zadána nová skupina, přiřadit mu tuhle skupinu
+        #pokud není zadána nová skupina, vytvořit mu skupinu podle názvu glyfu
+
+        #upravit všechny páry dle libosti
+        #vytvořit novou skupinu pro glyph
+
         self.printLog('===== Done. =====',False)
 
     def log(self, s):
-
         self.outputLog += s + '\n'
 
 
-
     def getLog(self):
-
         return self.outputLog
 
 # Script start
