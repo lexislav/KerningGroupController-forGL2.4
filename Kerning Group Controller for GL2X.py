@@ -261,6 +261,7 @@ class AppWorker:
             self.printLog('Proceeding Glyph %s' % G,False)
             self.printLog('will be removed from group %s' % settings["selectedGroup"],False)
             self.printLog('assigned to new group %s' % settings["newGroup"],False)
+
             #all kernign pairs for glyph (both sides for now)
             leftPairs = []
             rightPairs = []
@@ -273,6 +274,8 @@ class AppWorker:
                         rightPairs.append(self.nameMaker(L))
             glyphOnLeftSide = ", ".join(sorted(leftPairs))
             glyphOnRightSide = ", ".join(sorted(rightPairs))
+            #set glyphs to proceed
+            proceedPairGlyphs = []
 
             valueToSet = 0
             try:
@@ -293,9 +296,12 @@ class AppWorker:
             self.printLog('In pairs on left side %s' % glyphOnLeftSide,False)
             self.printLog('In pairs on right side %s' % glyphOnRightSide,False)
 
-        # doThatwithG
-        #pokud je zadána nová skupina, přiřadit mu tuhle skupinu
-        #pokud není zadána nová skupina, vytvořit mu skupinu podle názvu glyfu
+            # doThatwithG
+            # smazat skupinu
+            # přiřadit novou skupinu #NOTE: vytvářet novou skupinu podle názvu znaku? Trošku nebezpečné, pokud už tajková skupina existuje…
+
+            # for znak in proceedPairGlyphs:
+            # zkopírovat kerning z řídícho znaku, upravit pomocí value
 
         #upravit všechny páry dle libosti
         #vytvořit novou skupinu pro glyph
