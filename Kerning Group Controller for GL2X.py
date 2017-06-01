@@ -145,13 +145,15 @@ class AppController:
 
     def getSettings(self):
         out = {
-                "side": 'left' if self.w.radio.get() == 0 else 'right',
+                "side": "left" if self.w.radio.get() == 0 else "right",
                 "selectedGroup": self.selectedGroupName,
                 "proceedGlyphs": self.w.workWithGlyphs.get().replace(" ","").split(","),
                 "whatToDo": self.w.radioOptions.get(),
                 "valueToSet": self.w.value.get(),
                 "newGroup": self.w.assignNewGroup.get()
         }
+        if out["proceedGlyphs"] == [""]:
+            out["proceedGlyphs"] = []
         return out
 
     def switchList(self, sender):
@@ -252,25 +254,24 @@ class AppWorker:
         }
         return switcher.get(argument, "nothing")
 
-    def start(self, settings):
-        self.outputLog = ''
-        self.printLog('==== Starting ====',False)
+    def proceedGlyphs(self, settings):
         #vyjmout glyph ze skupiny
         for G in settings["proceedGlyphs"]:
             Gnamed = "@MMK_R_" + G
-            self.printLog('Proceeding Glyph %s' % G,False)
-            self.printLog('will be removed from group %s' % settings["selectedGroup"],False)
-            self.printLog('assigned to new group %s' % settings["newGroup"],False)
+            if settings["newGroup"] != "":
+                GnewGroup = settings["newGroup"]
+            else:
+                GnewGroup = G
 
             #all kernign pairs for glyph (both sides for now)
             leftPairs = []
             rightPairs = []
             for L in thisFont.kerning[masterID]:
-                if L == "@MMK_L_" + G:
+                if L == "@MMK_L_" + settings["selectedGroup"]:
                     for R in thisFont.kerning[masterID][L]:
                         leftPairs.append(self.nameMaker(R))
                 else:
-                    if Gnamed in thisFont.kerning[masterID][L]:
+                    if "@MMK_R_" + settings["selectedGroup"] in thisFont.kerning[masterID][L]:
                         rightPairs.append(self.nameMaker(L))
             glyphOnLeftSide = ", ".join(sorted(leftPairs))
             glyphOnRightSide = ", ".join(sorted(rightPairs))
@@ -284,6 +285,17 @@ class AppWorker:
                 self.printLog('No value. Set to 0.',False)
                 pass
 
+            self.printLog('Proceeding Glyph %s' % G,False)
+            self.printLog('was removed from group %s' % settings["selectedGroup"],False)
+            self.printLog('and assigned to new group %s' % GnewGroup,False)
+            # smazat skupinu
+            # přiřadit novou skupinu #NOTE: vytvářet novou skupinu podle názvu znaku? Trošku nebezpečné, pokud už tajková skupina existuje…
+            if settings["side"] == "left":
+                thisFont.glyphs[G].leftKerningGroup = GnewGroup
+            elif settings["side"] == "right":
+                thisFont.glyphs[G].rightKerningGroup = GnewGroup
+
+
             if settings["whatToDo"] == 0:
                 self.printLog('kerning will be copied from existing pairs', False)
             if settings["whatToDo"] == 1:
@@ -293,19 +305,30 @@ class AppWorker:
             if settings["whatToDo"] == 2:
                 self.printLog('kerning won''t be set', False)
 
-            self.printLog('In pairs on left side %s' % glyphOnLeftSide,False)
-            self.printLog('In pairs on right side %s' % glyphOnRightSide,False)
-
-            # doThatwithG
-            # smazat skupinu
-            # přiřadit novou skupinu #NOTE: vytvářet novou skupinu podle názvu znaku? Trošku nebezpečné, pokud už tajková skupina existuje…
+            self.printLog('In pairs on left side (leading glyph)',False)
+            self.printLog(glyphOnLeftSide,False)
+            self.printLog('In pairs on right side (leading glyph)',False)
+            self.printLog(glyphOnRightSide,False)
 
             # for znak in proceedPairGlyphs:
             # zkopírovat kerning z řídícho znaku, upravit pomocí value
+            # Set kerning for 'T' and all members of kerning class 'a'
+            # For LTR fonts, always use the .rightKerningKey for the first (left) glyph of the pair, .leftKerningKey for the second (right) glyph.
+            #font.setKerningForPair(font.selectedFontMaster.id, font.glyphs['T'].rightKerningKey, font.glyphs['a'].leftKerningKey, -60)
+        else:
+            self.printLog('No glyph to work with :-/',False)
 
         #upravit všechny páry dle libosti
         #vytvořit novou skupinu pro glyph
+        return
 
+    def start(self, settings):
+        self.outputLog = ''
+        self.printLog('==== Starting ====',False)
+        if len(settings["proceedGlyphs"]) > 0:
+            self.proceedGlyphs(settings)
+        else:
+            self.printLog('No glyph to work with :-/',False)
         self.printLog('===== Done. =====',False)
 
     def log(self, s):
