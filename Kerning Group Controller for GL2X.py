@@ -258,13 +258,9 @@ class AppWorker:
         #vyjmout glyph ze skupiny
         for G in settings["proceedGlyphs"]:
             Gnamed = "@MMK_R_" + G
-            if settings["newGroup"] == "":
-                GnewGroup = G
-            else:
-                GnewGroup = settings["newGroup"]
             self.printLog('Proceeding Glyph %s' % G,False)
             self.printLog('will be removed from group %s' % settings["selectedGroup"],False)
-            self.printLog('assigned to new group %s' % GnewGroup,False)
+            self.printLog('assigned to new group %s' % settings["newGroup"],False)
             #all kernign pairs for glyph (both sides for now)
             leftPairs = []
             rightPairs = []
@@ -282,9 +278,8 @@ class AppWorker:
             try:
                 valueToSet = int(settings["valueToSet"])
             except ValueError:
-                self.printLog('Value error',False)
+                self.printLog('No value. Set to 0.',False)
                 pass
-
 
             if settings["whatToDo"] == 0:
                 self.printLog('kerning will be copied from existing pairs', False)
