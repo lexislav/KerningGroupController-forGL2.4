@@ -303,8 +303,6 @@ class AppWorker:
                             rightPairs.append(self.nameMaker(L))
                 glyphOnLeftSide = ", ".join(sorted(leftPairs))
                 glyphOnRightSide = ", ".join(sorted(rightPairs))
-                print glyphOnLeftSide
-                print glyphOnRightSide
                 #all kernign pairs for glyph (both sides for now)
                 leftPairsG = []
                 rightPairsG = []
