@@ -9,30 +9,35 @@ Copyright (c) 2017 odoka.cz. All rights reserved.
 import vanilla
 import os
 
+#globals definitions
+thisFont = None
+selectedMaster = None
+masterID = None
+run = True
+kernDic = None
+groupsL = {}
+groupsR = {}
+
+
+
 try:
     thisFont = Glyphs.font
     selectedMaster = thisFont.selectedFontMaster
     masterID = selectedMaster.id
-    run = True
     if thisFont == None:
         run = False
-    # builing a more accessible kerning dictionary
-    # it's a dictionary of lists. newKernDic[master.id][left, right, value]
-    kernDic = thisFont.kerningDict()
-    newKernDic = {}
-    for thisMaster in thisFont.masters:
-    	kernList = []
-    	for key1 in kernDic[thisMaster.id]:
-    		for key2 in kernDic[thisMaster.id][key1]:
-    			pairInList = [key1, key2, kernDic[thisMaster.id][key1][key2]]
-    			kernList.append(pairInList)
-    		newKernDic[thisMaster.id] = kernList
+except:
+    print "No font or another startup error."
+    pass
 
-    # building popup list
-    # each value contains a list of glyphs involved. groupsL/R[groupName][glyph, glyph, glyph...]
+def refreshGlobals():
+    #reset values
+    global groupsL
+    global groupsR
+    global kernDic
     groupsL = {}
     groupsR = {}
-
+    kernDic = thisFont.kerningDict()
     for thisGlyph in thisFont.glyphs:
         if thisGlyph.leftKerningGroup != None:
     		if not thisGlyph.leftKerningGroup in groupsL:
@@ -42,10 +47,9 @@ try:
             if not thisGlyph.rightKerningGroup in groupsR:
     			groupsR[thisGlyph.rightKerningGroup] = []
             groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
+    return True
 
-except:
-    print "No font or another startup error."
-    pass
+refreshGlobals()
 
 class AppController:
 
@@ -140,8 +144,17 @@ class AppController:
 
         return w
 
-    #def updateWindow(self, sender):
-    #    self.w.textEditGlyphsNames._nsObject.setEditable_(self.w.checkBoxDeleteGlyphs.get())
+    def updateWindow(self, settings):
+        refreshGlobals()
+        self.w.popupGroup.set(0)
+        if settings["side"] == "left":
+            self.selectedGroupName = sorted(groupsL)[0]
+            self.refreshSelectedGroupGlyphs(groupsL)
+        else:
+            self.selectedGroupName = sorted(groupsR)[0]
+            self.refreshSelectedGroupGlyphs(groupsR)
+        self.adjustGroupList(settings["side"])
+        self.w.textG.set(','.join(sorted(self.selectedGroupGlyphs)))
 
     def getSettings(self):
         out = {
@@ -155,6 +168,16 @@ class AppController:
         if out["proceedGlyphs"] == [""]:
             out["proceedGlyphs"] = []
         return out
+
+    def adjustGroupList(self,side):
+        if side =="left":
+            updateThoseGroups = groupsL
+        else:
+            updateThoseGroups = groupsR
+        self.w.popupGroup.setItems([str(x) for x in sorted(updateThoseGroups)])
+        self.adjustGlyphsList
+        return
+
 
     def switchList(self, sender):
         index = 0
@@ -200,9 +223,12 @@ class AppController:
     def process(self, sender):
         self.w.spinner.start()
         worker = AppWorker()
-        worker.start(self.getSettings())
+        settings = self.getSettings()
+        worker.start(settings)
         self.w.spinner.stop()
         self.displayLog(worker.getLog())
+        self.updateWindow(settings)
+        # self.w.close()
 
     def displayLog(self, s):
         log = vanilla.FloatingWindow((360, 480), 'Log')
@@ -256,6 +282,8 @@ class AppWorker:
     def proceedGlyphs(self, settings):
         # go trought all glyphs named in dialog
         for G in settings["proceedGlyphs"]:
+            # if G in thisFont.glyphs:
+            #     print("Glyph exists " +G)
             Gnamed = "@MMK_R_" + G
             GnewGroup = settings["newGroup"]
             # new group named by glyph if not specified
@@ -281,7 +309,6 @@ class AppWorker:
             #all kernign pairs for glyph (both sides for now)
             leftPairsG = []
             rightPairsG = []
-            print(G)
             for L in thisFont.kerning[masterID]:
                 if L == "@MMK_L_" + G:
                     for R in thisFont.kerning[masterID][L]:
