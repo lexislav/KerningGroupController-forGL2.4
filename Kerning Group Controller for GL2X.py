@@ -282,162 +282,163 @@ class AppWorker:
     def proceedGlyphs(self, settings):
         # go trought all glyphs named in dialog
         for G in settings["proceedGlyphs"]:
-            # if G in thisFont.glyphs:
-            #     print("Glyph exists " +G)
-            Gnamed = "@MMK_R_" + G
-            GnewGroup = settings["newGroup"]
-            # new group named by glyph if not specified
-            # if settings["newGroup"] != "":
-            #     GnewGroup = settings["newGroup"]
-            # else:
-            #     GnewGroup = G
-
-            #all kernign pairs for group leading glyph (both sides for now)
-            leftPairs = []
-            rightPairs = []
-            print(settings["selectedGroup"])
-            for L in thisFont.kerning[masterID]:
-                if L == "@MMK_L_" + settings["selectedGroup"]:
-                    for R in thisFont.kerning[masterID][L]:
-                        leftPairs.append(self.nameMaker(R))
-                else:
-                    if "@MMK_R_" + settings["selectedGroup"] in thisFont.kerning[masterID][L]:
-                        rightPairs.append(self.nameMaker(L))
-            glyphOnLeftSide = ", ".join(sorted(leftPairs))
-            glyphOnRightSide = ", ".join(sorted(rightPairs))
-
-            #all kernign pairs for glyph (both sides for now)
-            leftPairsG = []
-            rightPairsG = []
-            for L in thisFont.kerning[masterID]:
-                if L == "@MMK_L_" + G:
-                    for R in thisFont.kerning[masterID][L]:
-                        leftPairsG.append(self.nameMaker(R))
-                else:
-                    if "@MMK_R_" + G in thisFont.kerning[masterID][L]:
-                        rightPairsG.append(self.nameMaker(L))
-            glyphOnLeftSideG = ", ".join(sorted(leftPairsG))
-            glyphOnRightSideG = ", ".join(sorted(rightPairsG))
-
-            #set glyphs to proceed
-            proceedPairGlyphs = []
-            deleteTheseGlyphs = []
-            if settings["side"] == "left":
-                proceedPairGlyphs = leftPairs
-                deleteTheseGlyphs = leftPairsG
-            elif settings["side"] == "right":
-                proceedPairGlyphs = rightPairs
-                deleteTheseGlyphs = rightPairsG
-
-            # value set
-            valueToSet = 0
-            try:
-                valueToSet = int(settings["valueToSet"])
-            except ValueError:
-                self.printLog('No value. Set to 0.',False)
-                pass
-
-            #glyph form group and assign new
-            self.printLog('Proceeding Glyph %s' % G,False)
-            self.printLog('was removed from group %s' % settings["selectedGroup"],False)
-            deletePairs = False
-            if settings["side"] == "left":
-                thisFont.glyphs[G].leftKerningGroup = GnewGroup
-                if GnewGroup in groupsL:
-                    deletePairs = True
+            if G in thisFont.glyphs:
+                Gnamed = "@MMK_R_" + G
+                GnewGroup = settings["newGroup"]
+                # new group named by glyph if not specified
+                # if settings["newGroup"] != "":
+                #     GnewGroup = settings["newGroup"]
                 # else:
-                #     GnewGroup = "@MMK_L_" + GnewGroup
-            elif settings["side"] == "right":
-                thisFont.glyphs[G].rightKerningGroup = GnewGroup
-                if GnewGroup in groupsR:
-                    deletePairs = True
-                # else:
-                #     GnewGroup = "@MMK_R_" + GnewGroup
-            if GnewGroup == "":
-                self.printLog('and will be assignet to no group.',False)
-            else:
-                self.printLog('and assigned to new group %s' % GnewGroup,False)
+                #     GnewGroup = G
 
-            #create pairs for every leading glyph decission model
-            createPairs = False
-            if GnewGroup != "" and G == settings["proceedGlyphs"][0]:
-                createPairs = True
-            if GnewGroup == "":
-                createPairs = True
+                #all kernign pairs for group leading glyph (both sides for now)
+                leftPairs = []
+                rightPairs = []
+                for L in thisFont.kerning[masterID]:
+                    if L == "@MMK_L_" + settings["selectedGroup"]:
+                        for R in thisFont.kerning[masterID][L]:
+                            leftPairs.append(self.nameMaker(R))
+                    else:
+                        if "@MMK_R_" + settings["selectedGroup"] in thisFont.kerning[masterID][L]:
+                            rightPairs.append(self.nameMaker(L))
+                glyphOnLeftSide = ", ".join(sorted(leftPairs))
+                glyphOnRightSide = ", ".join(sorted(rightPairs))
 
-            #Moving to existing group. Existing glyph's pairs will be deleted, not necessry anymore
-            if deletePairs:
+                #all kernign pairs for glyph (both sides for now)
+                leftPairsG = []
+                rightPairsG = []
+                for L in thisFont.kerning[masterID]:
+                    if L == "@MMK_L_" + G:
+                        for R in thisFont.kerning[masterID][L]:
+                            leftPairsG.append(self.nameMaker(R))
+                    else:
+                        if "@MMK_R_" + G in thisFont.kerning[masterID][L]:
+                            rightPairsG.append(self.nameMaker(L))
+                glyphOnLeftSideG = ", ".join(sorted(leftPairsG))
+                glyphOnRightSideG = ", ".join(sorted(rightPairsG))
+
+                #set glyphs to proceed
+                proceedPairGlyphs = []
+                deleteTheseGlyphs = []
+                if settings["side"] == "left":
+                    proceedPairGlyphs = leftPairs
+                    deleteTheseGlyphs = leftPairsG
+                elif settings["side"] == "right":
+                    proceedPairGlyphs = rightPairs
+                    deleteTheseGlyphs = rightPairsG
+
+                # value set
+                valueToSet = 0
+                try:
+                    valueToSet = int(settings["valueToSet"])
+                except ValueError:
+                    self.printLog('No value. Set to 0.',False)
+                    pass
+
+                #glyph from group and assign new
+                self.printLog('',False)
+                self.printLog('Proceeding Glyph %s' % G,False)
+                self.printLog('was removed from group %s' % settings["selectedGroup"],False)
+                deletePairs = False
+                if settings["side"] == "left":
+                    thisFont.glyphs[G].leftKerningGroup = GnewGroup
+                    if GnewGroup in groupsL:
+                        deletePairs = True
+                    # else:
+                    #     GnewGroup = "@MMK_L_" + GnewGroup
+                elif settings["side"] == "right":
+                    thisFont.glyphs[G].rightKerningGroup = GnewGroup
+                    if GnewGroup in groupsR:
+                        deletePairs = True
+                    # else:
+                    #     GnewGroup = "@MMK_R_" + GnewGroup
+                if GnewGroup == "":
+                    self.printLog('and will be assignet to no group.',False)
+                else:
+                    self.printLog('and assigned to new group %s' % GnewGroup,False)
+
+                #create pairs for every leading glyph decission model
                 createPairs = False
-                self.printLog('Glyph moved to existing group. No pairs needed anymore.', False)
-                self.printLog('Pairs to delete on left side',False)
-                self.printLog(glyphOnLeftSideG,False)
-                self.printLog('Pairs to delete on right side',False)
-                self.printLog(glyphOnRightSideG,False)
-                # remove kerning for group T and group A for all masters
-                # ('L' = left side of the pair and 'R' = left side of the pair)
-                # for master in font.masters:
-                #     thisFont.removeKerningForPair(masterID, '@MMK_L_T', '@MMK_R_A')
-                for pairForG in proceedPairGlyphs:
-                    if settings["side"] == "left":
-                        thisFont.removeKerningForPair(masterID, "@MMK_L_"+G, "@MMK_R_"+pairForG)
-                        # print("Trying to remove " + G + "_" + pairForG)
-                    elif settings["side"] == "right":
-                        thisFont.removeKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+G)
-                        # print("Pair LR: " + pairForG + "_" + G)
+                if GnewGroup != "" and G == settings["proceedGlyphs"][0]:
+                    createPairs = True
+                if GnewGroup == "":
+                    createPairs = True
 
-            #Creting new group. For every leading Glyph a pairs will be creted
-            if createPairs:
-                if settings["whatToDo"] == 0:
-                    self.printLog('kerning will be copied from existing pairs', False)
-                if settings["whatToDo"] == 1:
-                    self.printLog('kerning will be adjusted for %s  (percent)' % valueToSet, False)
-                if settings["whatToDo"] == 2:
-                    self.printLog('kerning will set to %s' % valueToSet, False)
-                if settings["whatToDo"] == 2:
-                    self.printLog('kerning won''t be set', False)
-                self.printLog('In pairs on left side (leading glyph)',False)
-                self.printLog(glyphOnLeftSide,False)
-                self.printLog('In pairs on right side (leading glyph)',False)
-                self.printLog(glyphOnRightSide,False)
-
-                for pairForG in proceedPairGlyphs:
-                    # print kerning between w and e for currently selected master
-                    # thisFont.kerningForPair(masterID, 'w', 'e')
-                    # -15.0
-                    # print kerning between group T and group A for currently selected master
+                #Moving to existing group. Existing glyph's pairs will be deleted, not necessry anymore
+                if deletePairs:
+                    createPairs = False
+                    self.printLog('Glyph moved to existing group. No pairs needed anymore.', False)
+                    self.printLog('Pairs to delete on left side',False)
+                    self.printLog(glyphOnLeftSideG,False)
+                    self.printLog('Pairs to delete on right side',False)
+                    self.printLog(glyphOnRightSideG,False)
+                    # remove kerning for group T and group A for all masters
                     # ('L' = left side of the pair and 'R' = left side of the pair)
-                    # font.kerningForPair(font.selectedFontMaster.id, '@MMK_L_T', '@MMK_R_A')
-                    # -75.0
-                    # in the same font, kerning between T and A would be zero, because they use group kerning instead.
-                    # font.kerningForPair(font.selectedFontMaster.id, 'T', 'A')
-                    # 9.22337203685e+18 # (this is the maximum number for 64 bit. It is used as an empty value)
-                    recalculatedValue = 0.0
-                    if settings["side"] == "left":
-                        # print("Pair LR: " + settings["selectedGroup"] + "_" + pairForG)
-                        wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+settings["selectedGroup"], "@MMK_R_"+pairForG)
-                        if settings["whatToDo"] == 0:
-                            recalculatedValue = wasValue
-                        if settings["whatToDo"] == 1:
-                            recalculatedValue = wasValue + self.percentage(wasValue,valueToSet)
-                        if settings["whatToDo"] == 2:
-                            recalculatedValue = valueToSet
-                        # print(recalculatedValue)
-                        if settings["whatToDo"] != 2:
-                            thisFont.setKerningForPair(masterID, "@MMK_L_"+GnewGroup, "@MMK_R_"+pairForG, recalculatedValue)
-                    elif settings["side"] == "right":
-                        # print("Pair LR: " + pairForG + "_" + settings["selectedGroup"])
-                        wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GnewGroup)
-                        # print(wasValue)
-                        if settings["whatToDo"] == 0:
-                            recalculatedValue = wasValue
-                        if settings["whatToDo"] == 1:
-                            recalculatedValue = wasValue + self.percentage(wasValue,valueToSet)
-                        if settings["whatToDo"] == 2:
-                            recalculatedValue = valueToSet
-                        # print(recalculatedValue)
-                        if settings["whatToDo"] != 2:
-                            thisFont.setKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GnewGroup, recalculatedValue)
+                    # for master in font.masters:
+                    #     thisFont.removeKerningForPair(masterID, '@MMK_L_T', '@MMK_R_A')
+                    for pairForG in proceedPairGlyphs:
+                        if settings["side"] == "left":
+                            thisFont.removeKerningForPair(masterID, "@MMK_L_"+G, "@MMK_R_"+pairForG)
+                            # print("Trying to remove " + G + "_" + pairForG)
+                        elif settings["side"] == "right":
+                            thisFont.removeKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+G)
+                            # print("Pair LR: " + pairForG + "_" + G)
 
+                #Creting new group. For every leading Glyph a pairs will be creted
+                if createPairs:
+                    if settings["whatToDo"] == 0:
+                        self.printLog('kerning will be copied from existing pairs', False)
+                    if settings["whatToDo"] == 1:
+                        self.printLog('kerning will be adjusted for %s  (percent)' % valueToSet, False)
+                    if settings["whatToDo"] == 2:
+                        self.printLog('kerning will set to %s' % valueToSet, False)
+                    if settings["whatToDo"] == 2:
+                        self.printLog('kerning won''t be set', False)
+                    self.printLog('In pairs on left side (leading glyph)',False)
+                    self.printLog(glyphOnLeftSide,False)
+                    self.printLog('In pairs on right side (leading glyph)',False)
+                    self.printLog(glyphOnRightSide,False)
+
+                    for pairForG in proceedPairGlyphs:
+                        # print kerning between w and e for currently selected master
+                        # thisFont.kerningForPair(masterID, 'w', 'e')
+                        # -15.0
+                        # print kerning between group T and group A for currently selected master
+                        # ('L' = left side of the pair and 'R' = left side of the pair)
+                        # font.kerningForPair(font.selectedFontMaster.id, '@MMK_L_T', '@MMK_R_A')
+                        # -75.0
+                        # in the same font, kerning between T and A would be zero, because they use group kerning instead.
+                        # font.kerningForPair(font.selectedFontMaster.id, 'T', 'A')
+                        # 9.22337203685e+18 # (this is the maximum number for 64 bit. It is used as an empty value)
+                        recalculatedValue = 0.0
+                        if settings["side"] == "left":
+                            # print("Pair LR: " + settings["selectedGroup"] + "_" + pairForG)
+                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+settings["selectedGroup"], "@MMK_R_"+pairForG)
+                            if settings["whatToDo"] == 0:
+                                recalculatedValue = wasValue
+                            if settings["whatToDo"] == 1:
+                                recalculatedValue = wasValue + self.percentage(wasValue,valueToSet)
+                            if settings["whatToDo"] == 2:
+                                recalculatedValue = valueToSet
+                            # print(recalculatedValue)
+                            if settings["whatToDo"] != 2:
+                                thisFont.setKerningForPair(masterID, "@MMK_L_"+GnewGroup, "@MMK_R_"+pairForG, recalculatedValue)
+                        elif settings["side"] == "right":
+                            # print("Pair LR: " + pairForG + "_" + settings["selectedGroup"])
+                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GnewGroup)
+                            # print(wasValue)
+                            if settings["whatToDo"] == 0:
+                                recalculatedValue = wasValue
+                            if settings["whatToDo"] == 1:
+                                recalculatedValue = wasValue + self.percentage(wasValue,valueToSet)
+                            if settings["whatToDo"] == 2:
+                                recalculatedValue = valueToSet
+                            # print(recalculatedValue)
+                            if settings["whatToDo"] != 2:
+                                thisFont.setKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GnewGroup, recalculatedValue)
+            else:
+                self.printLog('',False)
+                self.printLog("Wrong glyph name: " + G, True)
             # zkopírovat kerning z řídícho znaku, upravit pomocí value
             # Set kerning for 'T' and all members of kerning class 'a'
             # For LTR fonts, always use the .rightKerningKey for the first (left) glyph of the pair, .leftKerningKey for the second (right) glyph.
