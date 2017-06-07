@@ -286,10 +286,10 @@ class AppWorker:
                 Gnamed = "@MMK_R_" + G
                 GnewGroup = settings["newGroup"]
                 # new group named by glyph if not specified
-                # if settings["newGroup"] != "":
-                #     GnewGroup = settings["newGroup"]
-                # else:
-                #     GnewGroup = G
+                if GnewGroup != "":
+                    GpairName = GnewGroup
+                else:
+                    GpairName = G
 
                 #all kernign pairs for group leading glyph (both sides for now)
                 leftPairs = []
@@ -413,7 +413,7 @@ class AppWorker:
                         recalculatedValue = 0.0
                         if settings["side"] == "left":
                             # print("Pair LR: " + settings["selectedGroup"] + "_" + pairForG)
-                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+settings["selectedGroup"], "@MMK_R_"+pairForG)
+                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+GpairName, "@MMK_R_"+pairForG)
                             if settings["whatToDo"] == 0:
                                 recalculatedValue = wasValue
                             if settings["whatToDo"] == 1:
@@ -422,10 +422,10 @@ class AppWorker:
                                 recalculatedValue = valueToSet
                             # print(recalculatedValue)
                             if settings["whatToDo"] != 2:
-                                thisFont.setKerningForPair(masterID, "@MMK_L_"+GnewGroup, "@MMK_R_"+pairForG, recalculatedValue)
+                                thisFont.setKerningForPair(masterID, "@MMK_L_"+GpairName, "@MMK_R_"+pairForG, recalculatedValue)
                         elif settings["side"] == "right":
                             # print("Pair LR: " + pairForG + "_" + settings["selectedGroup"])
-                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GnewGroup)
+                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GpairName)
                             # print(wasValue)
                             if settings["whatToDo"] == 0:
                                 recalculatedValue = wasValue
@@ -435,7 +435,7 @@ class AppWorker:
                                 recalculatedValue = valueToSet
                             # print(recalculatedValue)
                             if settings["whatToDo"] != 2:
-                                thisFont.setKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GnewGroup, recalculatedValue)
+                                thisFont.setKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GpairName, recalculatedValue)
             else:
                 self.printLog('',False)
                 self.printLog("Wrong glyph name: " + G, True)
