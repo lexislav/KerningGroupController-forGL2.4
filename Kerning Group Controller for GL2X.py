@@ -1,7 +1,7 @@
-#MenuTitle: Kerning Groups Controller 0.2 for GL2.3+
+#MenuTitle: Kerning Groups Controller 0.2.2 for GL2.3+
 #encoding: utf-8
 """
-KerningGroupsController-forGL2.3.py v0.2.1
+KerningGroupsController-forGL2.3.py v0.2.2
 Created by Alexandr Hudeček on 2017-05-17.
 Copyright (c) 2017 odoka.cz. All rights reserved.
 """
@@ -432,7 +432,7 @@ class AppWorker:
                                 pairPreface = "@MMK_R_"
                             else:
                                 pairPreface = ""
-                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, pairPreface+GwasGroup)
+                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GwasGroup)
                             # print(wasValue)
                             if settings["whatToDo"] == 0:
                                 recalculatedValue = wasValue
