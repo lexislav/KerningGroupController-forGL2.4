@@ -297,10 +297,10 @@ class AppWorker:
                 for L in thisFont.kerning[masterID]:
                     if L == "@MMK_L_" + settings["selectedGroup"]:
                         for R in thisFont.kerning[masterID][L]:
-                            rightPairs.append(self.nameMaker(R))
+                            leftPairs.append(self.nameMaker(R))
                     else:
                         if "@MMK_R_" + settings["selectedGroup"] in thisFont.kerning[masterID][L]:
-                            leftPairs.append(self.nameMaker(L))
+                            rightPairs.append(self.nameMaker(L))
                 glyphOnLeftSide = ", ".join(sorted(leftPairs))
                 glyphOnRightSide = ", ".join(sorted(rightPairs))
                 #all kernign pairs for glyph (both sides for now)
