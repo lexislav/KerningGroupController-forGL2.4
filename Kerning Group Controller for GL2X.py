@@ -297,34 +297,32 @@ class AppWorker:
                 for L in thisFont.kerning[masterID]:
                     if L == "@MMK_L_" + settings["selectedGroup"]:
                         for R in thisFont.kerning[masterID][L]:
-                            leftPairs.append(self.nameMaker(R))
+                            rightPairs.append(self.nameMaker(R))
                     else:
                         if "@MMK_R_" + settings["selectedGroup"] in thisFont.kerning[masterID][L]:
-                            rightPairs.append(self.nameMaker(L))
+                            leftPairs.append(self.nameMaker(L))
                 glyphOnLeftSide = ", ".join(sorted(leftPairs))
                 glyphOnRightSide = ", ".join(sorted(rightPairs))
-                print glyphOnLeftSide
-                print glyphOnRightSide
                 #all kernign pairs for glyph (both sides for now)
                 leftPairsG = []
                 rightPairsG = []
                 for L in thisFont.kerning[masterID]:
                     if L == "@MMK_L_" + G:
                         for R in thisFont.kerning[masterID][L]:
-                            leftPairsG.append(self.nameMaker(R))
+                            rightPairsG.append(self.nameMaker(R))
                     else:
                         if "@MMK_R_" + G in thisFont.kerning[masterID][L]:
-                            rightPairsG.append(self.nameMaker(L))
+                            leftPairsG.append(self.nameMaker(L))
                 glyphOnLeftSideG = ", ".join(sorted(leftPairsG))
                 glyphOnRightSideG = ", ".join(sorted(rightPairsG))
 
                 #set glyphs to proceed
                 proceedPairGlyphs = []
                 deleteTheseGlyphs = []
-                if settings["side"] == "right":
+                if settings["side"] == "left":
                     proceedPairGlyphs = leftPairs
                     deleteTheseGlyphs = leftPairsG
-                elif settings["side"] == "left":
+                elif settings["side"] == "right":
                     proceedPairGlyphs = rightPairs
                     deleteTheseGlyphs = rightPairsG
 
@@ -374,10 +372,10 @@ class AppWorker:
                     self.printLog('Pairs to delete on right side',False)
                     self.printLog(glyphOnRightSideG,False)
                     for pairForG in proceedPairGlyphs:
-                        if settings["side"] == "right":
+                        if settings["side"] == "left":
                             thisFont.removeKerningForPair(masterID, "@MMK_L_"+G, "@MMK_R_"+pairForG)
                             # print("Trying to remove " + G + "_" + pairForG)
-                        elif settings["side"] == "left":
+                        elif settings["side"] == "right":
                             thisFont.removeKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+G)
                             # print("Pair LR: " + pairForG + "_" + G)
 
@@ -398,7 +396,7 @@ class AppWorker:
 
                     for pairForG in proceedPairGlyphs:
                         recalculatedValue = 0.0
-                        if settings["side"] == "right":
+                        if settings["side"] == "left":
                             # print("Pair LR: " + settings["selectedGroup"] + "_" + pairForG)
                             wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+GpairName, "@MMK_R_"+pairForG)
                             if settings["whatToDo"] == 0:
@@ -410,7 +408,7 @@ class AppWorker:
                             # print(recalculatedValue)
                             if settings["whatToDo"] != 2:
                                 thisFont.setKerningForPair(masterID, "@MMK_L_"+GpairName, "@MMK_R_"+pairForG, recalculatedValue)
-                        elif settings["side"] == "left":
+                        elif settings["side"] == "right":
                             # print("Pair LR: " + pairForG + "_" + settings["selectedGroup"])
                             wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GpairName)
                             # print(wasValue)
