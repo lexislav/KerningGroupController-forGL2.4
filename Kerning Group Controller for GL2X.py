@@ -1,7 +1,7 @@
-#MenuTitle: Kerning Groups Controller 0.2.2 for GL2.3+
+#MenuTitle: Kerning Groups Controller 0.2.3 for GL2.3+
 #encoding: utf-8
 """
-KerningGroupsController-forGL2.3.py v0.2.2
+KerningGroupsController-forGL2.3.py v0.2.3
 Created by Alexandr Hudeček on 2017-05-17.
 Copyright (c) 2017 odoka.cz. All rights reserved.
 """
@@ -410,7 +410,6 @@ class AppWorker:
                     for pairForG in proceedPairGlyphs:
                         recalculatedValue = 0.0
                         if settings["side"] == "left":
-                            # print("Pair LR: " + settings["selectedGroup"] + "_" + pairForG)
                             if GgroupPreface:
                                 pairPreface = "@MMK_L_"
                             else:
@@ -425,9 +424,7 @@ class AppWorker:
                             # print(recalculatedValue)
                             if settings["whatToDo"] != 2:
                                 thisFont.setKerningForPair(masterID, pairPreface+GpairName, "@MMK_R_"+pairForG, recalculatedValue)
-                            print pairPreface+GpairName + " / "+ "@MMK_R_"+pairForG
                         elif settings["side"] == "right":
-                            # print("Pair LR: " + pairForG + "_" + settings["selectedGroup"])
                             if GgroupPreface:
                                 pairPreface = "@MMK_R_"
                             else:
@@ -442,8 +439,7 @@ class AppWorker:
                                 recalculatedValue = valueToSet
                             # print(recalculatedValue)
                             if settings["whatToDo"] != 2:
-                                thisFont.setKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GpairName, recalculatedValue)
-                            print "@MMK_L_"+pairForG+" / "+pairPreface+GpairName
+                                thisFont.setKerningForPair(masterID, "@MMK_L_"+pairForG, pairPreface+GpairName, recalculatedValue)
             else:
                 self.printLog('',False)
                 self.printLog("Wrong glyph name: " + G, True)
