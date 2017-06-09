@@ -1,7 +1,7 @@
-#MenuTitle: Kerning Groups Controller 0.2 for GL2.3+
+#MenuTitle: Kerning Groups Controller 0.2.2 for GL2.3+
 #encoding: utf-8
 """
-KerningGroupsController-forGL2.3.py v0.2
+KerningGroupsController-forGL2.3.py v0.2.2
 Created by Alexandr Hudeček on 2017-05-17.
 Copyright (c) 2017 odoka.cz. All rights reserved.
 """
@@ -286,11 +286,14 @@ class AppWorker:
                 Gnamed = "@MMK_R_" + G
                 GnewGroup = settings["newGroup"]
                 GwasGroup = settings["selectedGroup"]
+                GgroupPreface = True
                 # new group named by glyph if not specified
                 if GnewGroup != "":
                     GpairName = GnewGroup
                 else:
                     GpairName = G
+                    GgroupPreface = False
+
                 #all kernign pairs for group leading glyph (both sides for now)
                 leftPairs = []
                 rightPairs = []
@@ -365,6 +368,7 @@ class AppWorker:
                     createPairs = True
 
                 #Moving to existing group. Existing glyph's pairs will be deleted, not necessry anymore
+                pairPreface = ""
                 if deletePairs:
                     createPairs = False
                     self.printLog('Glyph moved to existing group. No pairs needed anymore.', False)
@@ -374,10 +378,18 @@ class AppWorker:
                     self.printLog(glyphOnRightSideG,False)
                     for pairForG in proceedPairGlyphs:
                         if settings["side"] == "left":
-                            thisFont.removeKerningForPair(masterID, "@MMK_L_"+GwasGroup, "@MMK_R_"+pairForG)
+                            if GgroupPreface:
+                                pairPreface = "@MMK_L_"
+                            else:
+                                pairPreface = ""
+                            thisFont.removeKerningForPair(masterID, pairPreface+GwasGroup, "@MMK_R_"+pairForG)
                             print("Trying to remove " + GwasGroup + "_" + pairForG)
                         elif settings["side"] == "right":
-                            thisFont.removeKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GwasGroup)
+                            if GgroupPreface:
+                                pairPreface = "@MMK_R_"
+                            else:
+                                pairPreface = ""
+                            thisFont.removeKerningForPair(masterID, "@MMK_L_"+pairForG, pairPreface+GwasGroup)
                             print("Trying to remove: " + pairForG + "_" + GwasGroup)
 
                 #Creting new group. For every leading Glyph a pairs will be creted
@@ -399,6 +411,10 @@ class AppWorker:
                         recalculatedValue = 0.0
                         if settings["side"] == "left":
                             # print("Pair LR: " + settings["selectedGroup"] + "_" + pairForG)
+                            if GgroupPreface:
+                                pairPreface = "@MMK_L_"
+                            else:
+                                pairPreface = ""
                             wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+GwasGroup, "@MMK_R_"+pairForG)
                             if settings["whatToDo"] == 0:
                                 recalculatedValue = wasValue
@@ -408,9 +424,14 @@ class AppWorker:
                                 recalculatedValue = valueToSet
                             # print(recalculatedValue)
                             if settings["whatToDo"] != 2:
-                                thisFont.setKerningForPair(masterID, "@MMK_L_"+GpairName, "@MMK_R_"+pairForG, recalculatedValue)
+                                thisFont.setKerningForPair(masterID, pairPreface+GpairName, "@MMK_R_"+pairForG, recalculatedValue)
+                            print pairPreface+GpairName + " / "+ "@MMK_R_"+pairForG
                         elif settings["side"] == "right":
                             # print("Pair LR: " + pairForG + "_" + settings["selectedGroup"])
+                            if GgroupPreface:
+                                pairPreface = "@MMK_R_"
+                            else:
+                                pairPreface = ""
                             wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GwasGroup)
                             # print(wasValue)
                             if settings["whatToDo"] == 0:
@@ -422,6 +443,7 @@ class AppWorker:
                             # print(recalculatedValue)
                             if settings["whatToDo"] != 2:
                                 thisFont.setKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GpairName, recalculatedValue)
+                            print "@MMK_L_"+pairForG+" / "+pairPreface+GpairName
             else:
                 self.printLog('',False)
                 self.printLog("Wrong glyph name: " + G, True)
