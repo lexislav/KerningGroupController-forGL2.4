@@ -1,7 +1,7 @@
-#MenuTitle: Kerning Groups Controller 0.1 for GL2.3+
+#MenuTitle: Kerning Groups Controller 0.1.2 for GL2.3+
 #encoding: utf-8
 """
-KerningGroupsController-forGL2.3.py
+KerningGroupsController-forGL2.3.py v0.1.2
 Created by Alexandr Hudeček on 2017-05-17.
 Copyright (c) 2017 odoka.cz. All rights reserved.
 """
