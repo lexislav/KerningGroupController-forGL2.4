@@ -39,14 +39,14 @@ def refreshGlobals():
     groupsR = {}
     kernDic = thisFont.kerningDict()
     for thisGlyph in thisFont.glyphs:
-        if thisGlyph.leftKerningGroup != None:
-    		if not thisGlyph.leftKerningGroup in groupsL:
-    			groupsL[thisGlyph.leftKerningGroup] = []
-    		groupsL[thisGlyph.leftKerningGroup].append(thisGlyph.name)
         if thisGlyph.rightKerningGroup != None:
-            if not thisGlyph.rightKerningGroup in groupsR:
-    			groupsR[thisGlyph.rightKerningGroup] = []
-            groupsR[thisGlyph.rightKerningGroup].append(thisGlyph.name)
+    		if not thisGlyph.rightKerningGroup in groupsL:
+    			groupsL[thisGlyph.rightKerningGroup] = []
+    		groupsL[thisGlyph.rightKerningGroup].append(thisGlyph.name)
+        if thisGlyph.leftKerningGroup != None:
+            if not thisGlyph.leftKerningGroup in groupsR:
+    			groupsR[thisGlyph.leftKerningGroup] = []
+            groupsR[thisGlyph.leftKerningGroup].append(thisGlyph.name)
     return True
 
 refreshGlobals()
@@ -285,34 +285,35 @@ class AppWorker:
             if G in thisFont.glyphs:
                 Gnamed = "@MMK_R_" + G
                 GnewGroup = settings["newGroup"]
+                GwasGroup = settings["selectedGroup"]
                 # new group named by glyph if not specified
                 if GnewGroup != "":
                     GpairName = GnewGroup
                 else:
                     GpairName = G
-
                 #all kernign pairs for group leading glyph (both sides for now)
                 leftPairs = []
                 rightPairs = []
                 for L in thisFont.kerning[masterID]:
-                    if L == "@MMK_L_" + settings["selectedGroup"]:
+                    if L == "@MMK_L_" + GwasGroup:
                         for R in thisFont.kerning[masterID][L]:
-                            rightPairs.append(self.nameMaker(R))
+                            leftPairs.append(self.nameMaker(R))
                     else:
-                        if "@MMK_R_" + settings["selectedGroup"] in thisFont.kerning[masterID][L]:
-                            leftPairs.append(self.nameMaker(L))
+                        if "@MMK_R_" + GwasGroup in thisFont.kerning[masterID][L]:
+                            rightPairs.append(self.nameMaker(L))
                 glyphOnLeftSide = ", ".join(sorted(leftPairs))
                 glyphOnRightSide = ", ".join(sorted(rightPairs))
                 #all kernign pairs for glyph (both sides for now)
+
                 leftPairsG = []
                 rightPairsG = []
                 for L in thisFont.kerning[masterID]:
                     if L == "@MMK_L_" + G:
                         for R in thisFont.kerning[masterID][L]:
-                            rightPairsG.append(self.nameMaker(R))
+                            leftPairsG.append(self.nameMaker(R))
                     else:
                         if "@MMK_R_" + G in thisFont.kerning[masterID][L]:
-                            leftPairsG.append(self.nameMaker(L))
+                            rightPairsG.append(self.nameMaker(L))
                 glyphOnLeftSideG = ", ".join(sorted(leftPairsG))
                 glyphOnRightSideG = ", ".join(sorted(rightPairsG))
 
@@ -337,16 +338,16 @@ class AppWorker:
                 #glyph from group and assign new
                 self.printLog('',False)
                 self.printLog('Proceeding Glyph %s' % G,False)
-                self.printLog('was removed from group %s' % settings["selectedGroup"],False)
+                self.printLog('was removed from group %s' % GwasGroup,False)
                 deletePairs = False
                 if settings["side"] == "left":
-                    thisFont.glyphs[G].leftKerningGroup = GnewGroup
+                    thisFont.glyphs[G].rightKerningGroup = GnewGroup
                     if GnewGroup in groupsL:
                         deletePairs = True
                     # else:
                     #     GnewGroup = "@MMK_L_" + GnewGroup
                 elif settings["side"] == "right":
-                    thisFont.glyphs[G].rightKerningGroup = GnewGroup
+                    thisFont.glyphs[G].leftKerningGroup = GnewGroup
                     if GnewGroup in groupsR:
                         deletePairs = True
                     # else:
@@ -373,11 +374,11 @@ class AppWorker:
                     self.printLog(glyphOnRightSideG,False)
                     for pairForG in proceedPairGlyphs:
                         if settings["side"] == "left":
-                            thisFont.removeKerningForPair(masterID, "@MMK_L_"+G, "@MMK_R_"+pairForG)
-                            # print("Trying to remove " + G + "_" + pairForG)
+                            thisFont.removeKerningForPair(masterID, "@MMK_L_"+GwasGroup, "@MMK_R_"+pairForG)
+                            print("Trying to remove " + GwasGroup + "_" + pairForG)
                         elif settings["side"] == "right":
-                            thisFont.removeKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+G)
-                            # print("Pair LR: " + pairForG + "_" + G)
+                            thisFont.removeKerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GwasGroup)
+                            print("Trying to remove: " + pairForG + "_" + GwasGroup)
 
                 #Creting new group. For every leading Glyph a pairs will be creted
                 if createPairs:
@@ -398,7 +399,7 @@ class AppWorker:
                         recalculatedValue = 0.0
                         if settings["side"] == "left":
                             # print("Pair LR: " + settings["selectedGroup"] + "_" + pairForG)
-                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+GpairName, "@MMK_R_"+pairForG)
+                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+GwasGroup, "@MMK_R_"+pairForG)
                             if settings["whatToDo"] == 0:
                                 recalculatedValue = wasValue
                             if settings["whatToDo"] == 1:
@@ -410,7 +411,7 @@ class AppWorker:
                                 thisFont.setKerningForPair(masterID, "@MMK_L_"+GpairName, "@MMK_R_"+pairForG, recalculatedValue)
                         elif settings["side"] == "right":
                             # print("Pair LR: " + pairForG + "_" + settings["selectedGroup"])
-                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GpairName)
+                            wasValue = thisFont.kerningForPair(masterID, "@MMK_L_"+pairForG, "@MMK_R_"+GwasGroup)
                             # print(wasValue)
                             if settings["whatToDo"] == 0:
                                 recalculatedValue = wasValue
