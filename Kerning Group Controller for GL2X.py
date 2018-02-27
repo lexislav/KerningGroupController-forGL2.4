@@ -405,7 +405,7 @@ class AppWorker:
                         self.printLog('kerning will be adjusted for %s  (percent)' % valueToSet, False)
                     if settings["whatToDo"] == 2:
                         self.printLog('kerning will set to %s' % valueToSet, False)
-                    if settings["whatToDo"] == 2:
+                    if settings["whatToDo"] == 3:
                         self.printLog('kerning won''t be set', False)
                     if settings["side"] == "left":
                         self.printLog('In pairs on left side (leading glyph)',False)
@@ -430,7 +430,7 @@ class AppWorker:
                                 recalculatedValue = wasValue + self.percentage(wasValue,valueToSet)
                             if settings["whatToDo"] == 2:
                                 recalculatedValue = valueToSet
-                            if settings["whatToDo"] != 2:
+                            if settings["whatToDo"] != 3:
                                 thisFont.setKerningForPair(masterID, pairPreface+GpairName, pairForG, recalculatedValue)
                         elif settings["side"] == "right":
                             if GgroupPreface:
@@ -444,7 +444,7 @@ class AppWorker:
                                 recalculatedValue = wasValue + self.percentage(wasValue,valueToSet)
                             if settings["whatToDo"] == 2:
                                 recalculatedValue = valueToSet
-                            if settings["whatToDo"] != 2:
+                            if settings["whatToDo"] != 3:
                                 thisFont.setKerningForPair(masterID, pairForG, pairPreface+GpairName, recalculatedValue)
             else:
                 self.printLog('',False)
