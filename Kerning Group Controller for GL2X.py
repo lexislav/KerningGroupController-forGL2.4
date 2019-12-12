@@ -35,19 +35,8 @@ def refreshGlobals():
     global groupsL
     global groupsR
     global kernDic
-    groupsL = {}
-    groupsR = {}
     kernDic = thisFont.kerningDict()
-    for thisGlyph in thisFont.glyphs:
-        if thisGlyph.rightKerningGroup != None:
-    		if not thisGlyph.rightKerningGroup in groupsL:
-    			groupsL[thisGlyph.rightKerningGroup] = []
-    		groupsL[thisGlyph.rightKerningGroup].append(thisGlyph.name)
-        if thisGlyph.leftKerningGroup != None:
-            if not thisGlyph.leftKerningGroup in groupsR:
-    			groupsR[thisGlyph.leftKerningGroup] = []
-            groupsR[thisGlyph.leftKerningGroup].append(thisGlyph.name)
-    return True
+    return
 
 refreshGlobals()
 
@@ -77,9 +66,6 @@ class AppController:
     def __init__(self):
         if not run:
             return
-        if groupsL:
-            self.selectedGroupName = sorted(groupsL)[0]
-            self.refreshSelectedGroupGlyphs(groupsL)
         self.w = self.getWindow()
         self.w.open()
         pass
