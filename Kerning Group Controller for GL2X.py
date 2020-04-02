@@ -1,7 +1,7 @@
-#MenuTitle: Kerning Groups Controller 0.2.5 for GL2.3+
+#MenuTitle: Kerning Groups Controller 0.3.0 for GL2.3+
 #encoding: utf-8
 """
-KerningGroupsController-forGL2.3.py v0.2.5
+KerningGroupsController-forGL2.3.py v0.3.0
 Created by Alexandr Hudeček on 2017-05-17.
 Copyright (c) 2017 odoka.cz. All rights reserved.
 """
@@ -12,7 +12,6 @@ import os
 #globals definitions
 thisFont = None
 selectedMaster = None
-masterID = None
 run = True
 kernDic = None
 groupsL = {}
@@ -23,7 +22,6 @@ groupsR = {}
 try:
     thisFont = Glyphs.font
     selectedMaster = thisFont.selectedFontMaster
-    masterID = selectedMaster.id
     if thisFont == None:
         run = False
 except:
@@ -60,7 +58,7 @@ class AppController:
     spaceX = 10
     spaceY = 20
     windowWidth  = spaceX*3+editX*1.5
-    windowHeight = 365
+    windowHeight = 435
     popupAdjust = 3
 
     #properties
@@ -107,7 +105,6 @@ class AppController:
         height += self.spaceY+self.textY
         w.text2 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Choose glyph", sizeStyle='regular' )
         w.workWithGlyphs = vanilla.EditText( (self.spaceX + 130, height, -15, self.editY), "", sizeStyle = 'regular' )
-        #w.popupGlyph = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(self.selectedGroupGlyphs)], sizeStyle='regular' )
         height += self.spaceY+self.textY
         w.textGM = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Glyphs in group", sizeStyle='small' )
         glyphsInGroupHelper = "No groups. No glyphs."
@@ -124,24 +121,14 @@ class AppController:
         height += self.spaceY+self.editY
         w.text5 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Assign new group", sizeStyle='regular' )
         w.assignNewGroup = vanilla.EditText( (self.spaceX + 130, height, -15, self.editY), "", sizeStyle = 'regular' )
-        #w.popupAssign = vanilla.PopUpButton( (self.spaceX+130, height-self.popupAdjust, -10, self.editY), [str(x) for x in sorted(groupsL)], sizeStyle='regular' )
+        height += self.spaceY+self.editY
+        w.checkBoxProceedAllMasters = vanilla.CheckBox((self.spaceX, -35, -15, self.editY), "Proceed all masters", value=False, sizeStyle = 'regular')
+        height += 19
+        
         height += self.spaceY+self.textY
-        #w.textEG = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "Existing groups", sizeStyle='small' )
-        #w.textEGL = vanilla.TextBox( (self.spaceX+130, height, -15, -15), ','.join(sorted(groupsL)), sizeStyle='small' )
-        #height += self.spaceY+self.textY*2 + self.spaceY
-        #all font deactivated
-        #w.text6 = vanilla.TextBox((self.spaceX, height, 80, 20), "Apply to:", sizeStyle = 'regular')
-        #w.radioApplyTo = vanilla.RadioGroup((self.spaceX+130, height, -15, 40), [ "To current font only", "To all open fonts" ], sizeStyle = 'regular' )
-        #w.radioApplyTo.set(0)
-
-        # w.checkBoxRenameIndividualGlyphs = vanilla.CheckBox((80, height, -15, 19), "Rename individual glyphs", value=False, sizeStyle = 'regular')
-        # w.textOptions = vanilla.TextBox((15, height, 80, 20), "Remove:", sizeStyle = 'regular')
-
         w.buttonProcess = vanilla.Button((-15 - 80, -15 - 20, -15, -15), "Go", sizeStyle = 'regular', callback=self.process)
         w.setDefaultButton(w.buttonProcess)
-
         w.spinner = vanilla.ProgressSpinner((15, -15 - 16, 16, 16), sizeStyle = 'regular')
-
         return w
 
     def updateWindow(self, settings):
@@ -163,7 +150,8 @@ class AppController:
                 "proceedGlyphs": self.w.workWithGlyphs.get().replace(" ","").split(","),
                 "whatToDo": self.w.radioOptions.get(),
                 "valueToSet": self.w.value.get(),
-                "newGroup": self.w.assignNewGroup.get()
+                "newGroup": self.w.assignNewGroup.get(),
+                "proceedAllMasters": self.w.checkBoxProceedAllMasters.get()
         }
         if out["proceedGlyphs"] == [""]:
             out["proceedGlyphs"] = []
@@ -282,8 +270,11 @@ class AppWorker:
             2: "set",
         }
         return switcher.get(argument, "nothing")
-
-    def proceedGlyphs(self, settings):
+        
+    def glyphsRoutine(self, settings, masterID):
+        masterID = masterID
+        groupsL = {}
+        groupsR = {}
         # go trought all glyphs named in dialog
         for G in settings["proceedGlyphs"]:
             if G in thisFont.glyphs:
@@ -454,6 +445,19 @@ class AppWorker:
                 self.printLog('No glyph to work with :-/',False)
             else:
                 self.printLog('No more glyphs to work with :-/',False)
+        return
+
+    def proceedGlyphs(self, settings):
+        #check what to do
+        if settings["proceedAllMasters"]:
+            self.printLog('I am forced to proceed all masters. That\'s gonna be a lot of work.',False)
+            for oneMaster in thisFont.masters:
+                self.printLog('',False)
+                self.printLog('---- Processing Master %s ----' % oneMaster.name, False)
+                self.glyphsRoutine( settings, oneMaster.id )
+                self.printLog('---- master done ----', False)
+        else:
+            self.glyphsRoutine( settings, selectedMaster )
         return
 
     def percentage(self, wasValue, percents):
