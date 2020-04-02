@@ -420,7 +420,7 @@ class AppWorker:
                             if settings["whatToDo"] == 1:
                                 recalculatedValue = wasValue + self.percentage(wasValue,valueToSet)
                             if settings["whatToDo"] == 2:
-                                recalculatedValue = valueToSet
+                                recalculatedValue = wasValue + valueToSet
                             if settings["whatToDo"] != 3:
                                 thisFont.setKerningForPair(masterID, pairPreface+GpairName, pairForG, recalculatedValue)
                         elif settings["side"] == "right":
@@ -434,7 +434,7 @@ class AppWorker:
                             if settings["whatToDo"] == 1:
                                 recalculatedValue = wasValue + self.percentage(wasValue,valueToSet)
                             if settings["whatToDo"] == 2:
-                                recalculatedValue = valueToSet
+                                recalculatedValue = wasValue + valueToSet
                             if settings["whatToDo"] != 3:
                                 thisFont.setKerningForPair(masterID, pairForG, pairPreface+GpairName, recalculatedValue)
             else:
