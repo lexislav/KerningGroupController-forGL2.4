@@ -113,7 +113,7 @@ class AppController:
         w.textG = vanilla.TextBox( (self.spaceX+130, height, -15, -15), glyphsInGroupHelper, sizeStyle='small' )
         height += self.spaceY+self.textY*2 + self.spaceY
         w.text3 = vanilla.TextBox( (self.spaceX, height, 120, self.textY), "What to do", sizeStyle='regular' )
-        w.radioOptions = vanilla.RadioGroup( (self.spaceX+130, height, 150, self.textY*5), ["copy kerning values","relative change in %","absolute change","do not kern"], isVertical = True, sizeStyle='regular')
+        w.radioOptions = vanilla.RadioGroup( (self.spaceX+130, height, 150, self.textY*5), ["copy kerning values","relative change in %","adjust kerning by","do not kern"], isVertical = True, sizeStyle='regular')
         w.radioOptions.set(0)
         height += self.textY*5 + self.editY/2
         w.text4 = vanilla.TextBox( (self.spaceX+130, height, 40, self.textY), "Value", sizeStyle='regular' )
