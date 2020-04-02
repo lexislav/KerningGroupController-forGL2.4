@@ -1,7 +1,7 @@
-#MenuTitle: Kerning Groups Controller 0.3.0 for GL2.3+
+#MenuTitle: Kerning Groups Controller 0.3.1 for GL2.3+
 #encoding: utf-8
 """
-KerningGroupsController-forGL2.3.py v0.3.0
+KerningGroupsController-forGL2.3.py v0.3.1
 Created by Alexandr Hudeček on 2017-05-17.
 Copyright (c) 2017 odoka.cz. All rights reserved.
 """
@@ -215,7 +215,7 @@ class AppController:
         worker.start(settings)
         self.w.spinner.stop()
         self.displayLog(worker.getLog())
-        self.updateWindow(settings)
+        #self.updateWindow(settings)
         # self.w.close()
 
     def displayLog(self, s):
